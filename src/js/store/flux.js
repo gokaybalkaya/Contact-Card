@@ -1,45 +1,68 @@
+import { EditContact } from "../views/editContact";
 const getState = ({ getStore, getActions, setStore }) => {
 	return {
-		store: {
-			demo: [
-				{
-					title: "FIRST",
-					background: "white",
-					initial: "white"
-				},
-				{
-					title: "SECOND",
-					background: "white",
-					initial: "white"
-				}
-			]
+	  store: {
+		demo: [
+		  {
+			title: "FIRST",
+			background: "white",
+			initial: "white"
+		  },
+		  {
+			title: "SECOND",
+			background: "white",
+			initial: "white"
+		  }
+		],
+		contacts: []
+	  },
+	  actions:{
+    
+	  editContact:(index, object) =>{
+// getStore().contacts[index]=object
+getStore().contacts.splice(index,1,object)
+console.log(getStore().contacts)
+	  },
+
+		saveContact: (contact) => {
+		  const store = getStore();
+  
+		  const updatedContacts = store.contacts.concat(contact);
+  
+		  setStore({ contacts: updatedContacts });
 		},
-		actions: {
-			// Use getActions to call a function within a fuction
-			exampleFunction: () => {
-				getActions().changeColor(0, "green");
-			},
-			loadSomeData: () => {
-				/**
-					fetch().then().then(data => setStore({ "foo": data.bar }))
-				*/
-			},
-			changeColor: (index, color) => {
-				//get the store
-				const store = getStore();
-
-				//we have to loop the entire demo array to look for the respective index
-				//and change its color
-				const demo = store.demo.map((elm, i) => {
-					if (i === index) elm.background = color;
-					return elm;
-				});
-
-				//reset the global store
-				setStore({ demo: demo });
-			}
+		deleteContact: (id) => {
+		  const store = getStore();
+  
+		  const updatedContacts = store.contacts.filter((contact, i) => id !== contact.id);
+  
+		  setStore({ contacts: updatedContacts });
+		},
+  
+		getContacts: () => {
+		console.log("blah")  
+		  const store = getStore();
+  
+		  fetch("https://jsonplaceholder.typicode.com/users")
+			.then((response) => {
+			  if (response.ok) {
+				return response.json();
+			  } else {
+				throw Error("Something is wrong");
+			  }
+			})
+			.then((data) => {
+			const newData = data.map(e =>{
+e.address = e.address.street
+			}) 
+			  setStore({ contacts: data });
+			})
+			.catch((error) => {
+			  console.log(error);
+			});
 		}
+	  }
 	};
-};
-
-export default getState;
+  };
+  
+  export default getState;
